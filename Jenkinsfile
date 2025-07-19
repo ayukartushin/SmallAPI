@@ -17,6 +17,18 @@ pipeline {
       }
     }
 
+  stage('Check credentials') {
+    steps {
+      withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+        sh '''
+          echo "NEXUS USER: $USER"
+          echo "NEXUS PASS: ${#PASS}" # НЕ выводи сам пароль, только длину или маску
+        '''
+      }
+    }
+  }
+
+
     stage('Login to Nexus') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
