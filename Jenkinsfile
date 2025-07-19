@@ -20,10 +20,10 @@ pipeline {
   stage('Check credentials') {
     steps {
       withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-        sh '''
+        sh """
           echo "NEXUS USER: $USER"
           echo "NEXUS PASS: ${#PASS}" # НЕ выводи сам пароль, только длину или маску
-        '''
+        """
       }
     }
   }
@@ -31,12 +31,12 @@ pipeline {
   stage('Docker Push') {
     steps {
       withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-        sh '''
+        sh """
           echo "$PASS" | docker login ${REGISTRY} -u "$USER" --password-stdin
           docker push ${IMAGE_FULL}
           docker tag ${IMAGE_FULL} ${IMAGE_LATEST}
           docker push ${IMAGE_LATEST}
-        '''
+        """
       }
     }
   }
