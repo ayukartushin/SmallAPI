@@ -27,27 +27,18 @@ pipeline {
       }
     }
   }
-
-
-    stage('Login to Nexus') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-          sh "echo \$PASS | docker login ${REGISTRY} -u \$USER --password-stdin"
-        }
-      }
-    }
-
-    stage('Push Docker image') {
-      steps {
-        sh "docker push ${IMAGE_FULL}"
-      }
-    }
-
-    stage('Tag latest') {
-      steps {
-        sh "docker tag ${IMAGE_FULL} ${IMAGE_LATEST}"
-        sh "docker push ${IMAGE_LATEST}"
+    
+  stage('Docker Push') {
+    steps {
+      withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+        sh '''
+          echo "$PASS" | docker login ${REGISTRY} -u "$USER" --password-stdin
+          docker push ${IMAGE_FULL}
+          docker tag ${IMAGE_FULL} ${IMAGE_LATEST}
+          docker push ${IMAGE_LATEST}
+        '''
       }
     }
   }
+
 }
