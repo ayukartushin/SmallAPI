@@ -14,6 +14,7 @@ class Animal(BaseModel):
 db: Dict[int, Animal] = {}
 counter = 1
 
+
 # Create
 @app.post("/animals")
 def create_animal(animal: Animal):
