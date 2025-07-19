@@ -17,28 +17,25 @@ pipeline {
       }
     }
 
-  stage('Check credentials') {
-    steps {
-      withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-        sh """
-          echo "NEXUS USER: $USER"
-          echo "NEXUS PASS: ${#PASS}" # НЕ выводи сам пароль, только длину или маску
-        """
-      }
-    }
-  }
-    
   stage('Docker Push') {
     steps {
       withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
         sh """
-          echo "$PASS" | docker login ${REGISTRY} -u "$USER" --password-stdin
-          docker push ${IMAGE_FULL}
-          docker tag ${IMAGE_FULL} ${IMAGE_LATEST}
-          docker push ${IMAGE_LATEST}
+          echo "Logging in to $REGISTRY as \$USER"
+          echo "\$PASS" | docker login $REGISTRY -u "\$USER" --password-stdin
+
+          echo "Pushing image: $IMAGE_FULL"
+          docker push $IMAGE_FULL
+
+          echo "Tagging image as latest"
+          docker tag $IMAGE_FULL $IMAGE_LATEST
+
+          echo "Pushing image: $IMAGE_LATEST"
+          docker push $IMAGE_LATEST
+
+          docker logout $REGISTRY
         """
       }
     }
   }
-
 }
