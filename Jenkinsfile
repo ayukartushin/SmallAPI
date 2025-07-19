@@ -12,6 +12,7 @@ pipeline {
   stages {
     stage('Build Docker image') {
       steps {
+        echo "Сборка ${IMAGE_FULL} началась!"
         sh "docker build -t ${IMAGE_FULL} ."
       }
     }
